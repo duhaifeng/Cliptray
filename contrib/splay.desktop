@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=splay
+Comment=Clipboard history (iCopy for Linux)
+Exec=splay daemon
+Terminal=false
+X-GNOME-Autostart-enabled=true
