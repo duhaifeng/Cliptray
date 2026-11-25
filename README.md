@@ -6,6 +6,10 @@ splay keeps a history of what you copy and shows it as a row of cards along the 
 
 It is a Rust clipboard history tool in the spirit of [iCopy](https://icopy.better365.cn), for Linux and macOS.
 
+![History strip along the bottom of the screen](docs/images/panel.png)
+
+![Settings](docs/images/settings.png)
+
 ## Install
 
 **Debian / Ubuntu (amd64).** Download `splay_0.1.0_amd64.deb` from the [latest release](https://github.com/duhaifeng/splay/releases/latest):

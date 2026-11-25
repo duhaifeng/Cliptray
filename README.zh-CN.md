@@ -6,6 +6,10 @@ splay 记住你复制过的内容，并在屏幕底部铺成一排卡片。按 *
 
 这是用 Rust 写的剪切板历史工具，交互参照 [iCopy](https://icopy.better365.cn)，运行在 Linux 和 macOS 上。
 
+![贴在屏幕底部的历史卡片条](docs/images/panel.png)
+
+![设置](docs/images/settings.png)
+
 ## 安装
 
 **Debian / Ubuntu（amd64）。** 从[最新 Release](https://github.com/duhaifeng/splay/releases/latest) 下载 `splay_0.1.0_amd64.deb`：
