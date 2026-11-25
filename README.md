@@ -118,3 +118,7 @@ cargo test
 The daemon owns the clipboard and the history database. The panel is a short-lived child process: on Linux, clipboard contents belong to the process that wrote them and disappear when that process exits, so the daemon writes the chosen item and pastes it. The panel only returns the selection.
 
 Not carried over from iCopy: quick replies, the clipboard stack, iCloud backup, Excel import and export, themes, sounds, double-modifier or Fn hotkeys, a vertical list, and export as an image, RTF, or TXT.
+
+## License
+
+[MIT](LICENSE)
