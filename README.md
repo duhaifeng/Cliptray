@@ -12,10 +12,18 @@ It is a Rust clipboard history tool in the spirit of [iCopy](https://icopy.bette
 
 ## Install
 
-**Debian / Ubuntu (amd64).** Download `cliptray_0.1.0_amd64.deb` from the [latest release](https://github.com/duhaifeng/Cliptray/releases/latest):
+**macOS (Apple Silicon).** Download `Cliptray_0.1.1_macos_arm64.zip` from the [latest release](https://github.com/duhaifeng/Cliptray/releases/latest), unzip it, and open `Cliptray.app`.
+
+If it will not open, macOS has quarantined the download. In the directory that contains the app, clear that flag and open it again:
 
 ```bash
-sudo dpkg -i cliptray_0.1.0_amd64.deb
+xattr -dr com.apple.quarantine Cliptray.app
+```
+
+**Debian / Ubuntu (amd64).** Download `splay_0.1.0_amd64.deb` from the [v0.1.0 release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.0):
+
+```bash
+sudo dpkg -i splay_0.1.0_amd64.deb
 ```
 
 The package installs `/usr/bin/cliptray`, an application menu entry, and an XDG autostart file. A systemd user unit is installed but not enabled, so it does not start a second daemon next to the autostart entry.

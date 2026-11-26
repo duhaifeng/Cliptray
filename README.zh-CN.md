@@ -12,10 +12,18 @@ Cliptray 记住你复制过的内容，并在屏幕底部铺成一排卡片。�
 
 ## 安装
 
-**Debian / Ubuntu（amd64）。** 从[最新 Release](https://github.com/duhaifeng/Cliptray/releases/latest) 下载 `cliptray_0.1.0_amd64.deb`：
+**macOS（Apple Silicon）。** 从[最新 Release](https://github.com/duhaifeng/Cliptray/releases/latest) 下载 `Cliptray_0.1.1_macos_arm64.zip`，解压后打开 `Cliptray.app`。
+
+如果打不开，是系统给下载文件加了隔离标记。在 `Cliptray.app` 所在目录执行下面的命令，然后再打开：
 
 ```bash
-sudo dpkg -i cliptray_0.1.0_amd64.deb
+xattr -dr com.apple.quarantine Cliptray.app
+```
+
+**Debian / Ubuntu（amd64）。** 从 [v0.1.0 Release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.0) 下载 `splay_0.1.0_amd64.deb`：
+
+```bash
+sudo dpkg -i splay_0.1.0_amd64.deb
 ```
 
 包会装上 `/usr/bin/cliptray`、应用菜单入口，以及一份 XDG 自动启动项。systemd 用户单元会装上，但默认不启用，避免和自动启动项各拉起一个进程。
