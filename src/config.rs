@@ -215,7 +215,7 @@ pub struct Paths {
 
 impl Paths {
     pub fn resolve(cfg: &Config, config_override: Option<&Path>) -> Result<Self> {
-        let dirs = ProjectDirs::from("", "", "splay").context("无法确定用户主目录")?;
+        let dirs = ProjectDirs::from("", "", "cliptray").context("无法确定用户主目录")?;
         let config_file = config_override
             .map(Path::to_owned)
             .unwrap_or_else(|| dirs.config_dir().join("config.toml"));
@@ -226,12 +226,12 @@ impl Paths {
         let runtime = std::env::var_os("XDG_RUNTIME_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|| {
-                std::env::temp_dir().join(format!("splay-{}", unsafe { libc::getuid() }))
+                std::env::temp_dir().join(format!("cliptray-{}", unsafe { libc::getuid() }))
             });
         Ok(Paths {
             config_file,
             data_dir,
-            socket: runtime.join("splay.sock"),
+            socket: runtime.join("cliptray.sock"),
         })
     }
 }

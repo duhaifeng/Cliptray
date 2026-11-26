@@ -1,4 +1,4 @@
-//! splay：iCopy 的 Linux 复刻（Rust）。
+//! Cliptray：iCopy 的 Linux 复刻（Rust）。
 //!
 //! 依赖方向：`model` / `config` / `hotkey` 是纯数据；`store`、`clipboard`、`platform`、`appicon` 是适配层；
 //! `monitor`、`daemon`、`picker` 是应用逻辑；`main` 只做命令行装配。

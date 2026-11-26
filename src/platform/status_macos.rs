@@ -109,7 +109,7 @@ fn build(labels: &TrayLabels) -> Result<(TrayIcon, MenuIds), String> {
     menu.append(&quit).map_err(|e| e.to_string())?;
     let tray = TrayIconBuilder::new()
         .with_menu(Box::new(menu))
-        .with_tooltip("splay")
+        .with_tooltip("Cliptray")
         .with_icon(icon)
         .with_icon_as_template(true)
         .with_menu_on_left_click(true)

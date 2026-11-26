@@ -77,11 +77,11 @@ impl BoardTray {
 
 impl ksni::Tray for BoardTray {
     fn id(&self) -> String {
-        "splay".into()
+        "cliptray".into()
     }
 
     fn title(&self) -> String {
-        "splay".into()
+        "Cliptray".into()
     }
 
     fn icon_pixmap(&self) -> Vec<ksni::Icon> {

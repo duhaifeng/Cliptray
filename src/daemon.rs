@@ -215,13 +215,13 @@ fn run_inner(
             eprintln!("全局热键已注册: {hotkey}");
         }
         Err(e) => {
-            eprintln!("未能注册全局热键 {hotkey}: {e:#}\n  仍可用 `splay toggle` 唤出面板。")
+            eprintln!("未能注册全局热键 {hotkey}: {e:#}\n  仍可用 `cliptray toggle` 唤出面板。")
         }
     }
 
     install_signal_handlers();
     eprintln!(
-        "splay 守护进程已启动，数据目录: {}",
+        "Cliptray 守护进程已启动，数据目录: {}",
         paths.data_dir.display()
     );
 
@@ -337,7 +337,7 @@ fn run_inner(
 
     close(&mut picker);
     close_settings(&mut settings);
-    eprintln!("splay 守护进程已退出");
+    eprintln!("Cliptray 守护进程已退出");
     Ok(())
 }
 

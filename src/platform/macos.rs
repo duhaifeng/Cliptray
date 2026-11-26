@@ -461,7 +461,7 @@ pub fn send_key(spec: &HotkeySpec) -> Result<()> {
     // 未授权时 CGEventPost 不报错，只是静默丢弃事件，所以要先检查。
     anyhow::ensure!(
         accessibility_trusted(),
-        "没有「辅助功能」授权：请在「系统设置 → 隐私与安全性 → 辅助功能」里允许启动 splay 守护进程的程序"
+        "没有「辅助功能」授权：请在「系统设置 → 隐私与安全性 → 辅助功能」里允许启动 Cliptray 守护进程的程序"
     );
     let keycode = carbon_keycode(&spec.key)
         .ok_or_else(|| anyhow!("macOS 没有对应的键位: {}", spec.key))? as u16;

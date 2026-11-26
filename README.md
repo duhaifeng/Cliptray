@@ -1,8 +1,8 @@
-# splay
+# Cliptray
 
 [中文](README.zh-CN.md)
 
-splay keeps a history of what you copy and shows it as a row of cards along the bottom of the screen. Press **Shift+Super+C** (⇧⌘C on a Mac) to open the strip, pick an item, and paste it back into the window you were using.
+Cliptray keeps a history of what you copy and shows it as a row of cards along the bottom of the screen. Press **Shift+Super+C** (⇧⌘C on a Mac) to open the strip, pick an item, and paste it back into the window you were using.
 
 It is a Rust clipboard history tool in the spirit of [iCopy](https://icopy.better365.cn), for Linux and macOS.
 
@@ -12,20 +12,20 @@ It is a Rust clipboard history tool in the spirit of [iCopy](https://icopy.bette
 
 ## Install
 
-**Debian / Ubuntu (amd64).** Download `splay_0.1.0_amd64.deb` from the [latest release](https://github.com/duhaifeng/splay/releases/latest):
+**Debian / Ubuntu (amd64).** Download `cliptray_0.1.0_amd64.deb` from the [latest release](https://github.com/duhaifeng/Cliptray/releases/latest):
 
 ```bash
-sudo dpkg -i splay_0.1.0_amd64.deb
+sudo dpkg -i cliptray_0.1.0_amd64.deb
 ```
 
-The package installs `/usr/bin/splay`, an application menu entry, and an XDG autostart file. A systemd user unit is installed but not enabled, so it does not start a second daemon next to the autostart entry.
+The package installs `/usr/bin/cliptray`, an application menu entry, and an XDG autostart file. A systemd user unit is installed but not enabled, so it does not start a second daemon next to the autostart entry.
 
 **From source.** You need Rust and a C compiler (SQLite is bundled).
 
 ```bash
 cargo install --path .
-splay doctor    # session, hotkey, clipboard, CJK font
-splay daemon    # run in the foreground
+cliptray doctor    # session, hotkey, clipboard, CJK font
+cliptray daemon    # run in the foreground
 ```
 
 At runtime the panel needs libxkbcommon, an X11 or Wayland client library, OpenGL or EGL, and a CJK font such as `fonts-noto-cjk`. Without that font the interface falls back to English and Chinese text is drawn as boxes.
@@ -61,19 +61,19 @@ The language follows the system. On macOS that is the preferred language list. T
 ## Commands
 
 ```
-splay daemon                 resident process, with a menu bar icon
-splay toggle | show | hide   show or hide the panel
-splay settings               open settings
-splay status | quit
-splay list [--tag text] [--search WORD] [--limit 20]
-splay clear [--tag all] [--keep-favorites] --yes
-splay config path | show | init [--force]   # --force backs up the old file first
-splay doctor
+cliptray daemon                 resident process, with a menu bar icon
+cliptray toggle | show | hide   show or hide the panel
+cliptray settings               open settings
+cliptray status | quit
+cliptray list [--tag text] [--search WORD] [--limit 20]
+cliptray clear [--tag all] [--keep-favorites] --yes
+cliptray config path | show | init [--force]   # --force backs up the old file first
+cliptray doctor
 ```
 
 ## Configuration
 
-`~/.config/splay/config.toml`. Missing fields use the defaults. `splay config show` prints the values in effect.
+`~/.config/cliptray/config.toml`. Missing fields use the defaults. `cliptray config show` prints the values in effect.
 
 ```toml
 hotkey = "shift+super+c"      # cmd, command, meta, and win are aliases of super
@@ -94,26 +94,26 @@ show_status_item = true
 launch_at_startup = false     # next login. macOS writes a LaunchAgent; Linux writes an XDG autostart file
 ```
 
-History lives in `~/.local/share/splay/`: `data.sqlite`, `tempFiles/` for images, `icons/` for source-app icons, and `last_tag` for the last category.
+History lives in `~/.local/share/cliptray/`: `data.sqlite`, `tempFiles/` for images, `icons/` for source-app icons, and `last_tag` for the last category.
 
 ## Linux and macOS
 
 | | X11 | Wayland | macOS |
 | --- | --- | --- | --- |
-| Global hotkey | Grabbed by splay | GNOME uses the bundled Shell extension `splay@splay.local`. Other compositors cannot be grabbed; bind Shift+Super+C to `splay toggle` | Carbon hotkey. The process that starts the daemon needs Accessibility to paste |
+| Global hotkey | Grabbed by Cliptray | GNOME uses the bundled Shell extension `cliptray@cliptray.local`. Other compositors cannot be grabbed; bind Shift+Super+C to `cliptray toggle` | Carbon hotkey. The process that starts the daemon needs Accessibility to paste |
 | Paste | XTest | GNOME uses Mutter RemoteDesktop. Other compositors need `wtype` | CGEvent, after Accessibility is granted. Otherwise the item is only copied |
 | Source app and block list | `WM_CLASS` | Not available, so the block list does not apply | App name |
 | Clipboard watch | Yes | Needs the compositor's data-control protocol | Yes |
 
-`splay doctor` reports what the current session can actually do. On GNOME Wayland the extension is copied into `~/.local/share/gnome-shell/extensions/` the first time the daemon starts. Shell loads a new extension at the next login, so the hotkey stays dead until then. `SPLAY_BACKEND=x11` forces the X11 path.
+`cliptray doctor` reports what the current session can actually do. On GNOME Wayland the extension is copied into `~/.local/share/gnome-shell/extensions/` the first time the daemon starts. Shell loads a new extension at the next login, so the hotkey stays dead until then. `CLIPTRAY_BACKEND=x11` forces the X11 path.
 
-macOS builds are produced with `./package-mac.sh` (`dist/splay.app` and a zip). Linux amd64 packages are produced with `./package-deb.sh`.
+macOS builds are produced with `./package-mac.sh` (`dist/Cliptray.app` and a zip). Linux amd64 packages are produced with `./package-deb.sh`.
 
 ## Build
 
 ```bash
 cargo test
-./package-deb.sh    # dist/splay_<version>_amd64.deb
+./package-deb.sh    # dist/cliptray_<version>_amd64.deb
 ./package-mac.sh    # on macOS
 ```
 

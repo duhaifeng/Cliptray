@@ -69,8 +69,8 @@ pub fn run(cfg: Config, store: Store, data_dir: &Path, config_file: &Path) -> Re
     let insets = platform::work_area_insets().map_or((0.0, 0.0, 0.0), |(l, r, _, b)| (l, r, b));
     let (pos, size) = board_frame_inset(screen, insets);
     let viewport = egui::ViewportBuilder::default()
-        .with_title("splay")
-        .with_app_id("splay")
+        .with_title("Cliptray")
+        .with_app_id("cliptray")
         .with_position(pos)
         .with_inner_size(size)
         .with_decorations(false)
@@ -100,7 +100,7 @@ pub fn run(cfg: Config, store: Store, data_dir: &Path, config_file: &Path) -> Re
         config_file: config_file.to_owned(),
     };
     eframe::run_native(
-        "splay",
+        "Cliptray",
         options,
         Box::new(move |cc| {
             #[cfg(target_os = "macos")]

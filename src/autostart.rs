@@ -1,15 +1,15 @@
 //! “开机自启动”。
 //!
-//! macOS 写 `~/Library/LaunchAgents/com.splay.app.plist`，Linux 写
-//! `~/.config/autostart/splay.desktop`。只写文件，不 `launchctl bootstrap`：
+//! macOS 写 `~/Library/LaunchAgents/com.cliptray.app.plist`，Linux 写
+//! `~/.config/autostart/cliptray.desktop`。只写文件，不 `launchctl bootstrap`：
 //! bootstrap 会立刻再拉起一个进程，和正在运行的守护进程抢 socket。下次登录才生效。
 
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
-const MAC_LABEL: &str = "com.splay.app";
-const LINUX_NAME: &str = "splay.desktop";
+const MAC_LABEL: &str = "com.cliptray.app";
+const LINUX_NAME: &str = "cliptray.desktop";
 
 pub fn apply(enabled: bool, program: &Path) -> Result<()> {
     let home = std::env::var_os("HOME").context("没有 HOME，无法写入开机启动项")?;
@@ -77,7 +77,7 @@ pub fn launch_agent_plist(program: &Path) -> String {
 pub fn desktop_entry(program: &Path) -> String {
     let program = program.display().to_string().replace('"', "\\\"");
     format!(
-        "[Desktop Entry]\nType=Application\nName=splay\nComment=Clipboard history\nExec=\"{program}\" daemon\nTerminal=false\nX-GNOME-Autostart-enabled=true\n"
+        "[Desktop Entry]\nType=Application\nName=Cliptray\nComment=Clipboard history\nExec=\"{program}\" daemon\nTerminal=false\nX-GNOME-Autostart-enabled=true\n"
     )
 }
 
@@ -88,16 +88,16 @@ mod tests {
     #[test]
     fn enable_writes_and_disable_removes() {
         let home = tempfile::tempdir().unwrap();
-        let program = Path::new("/opt/splay");
+        let program = Path::new("/opt/cliptray");
         apply_in(home.path(), true, program).unwrap();
         let path = autostart_path(home.path());
         let body = std::fs::read_to_string(&path).unwrap();
         if cfg!(target_os = "macos") {
-            assert!(body.contains("/opt/splay"));
+            assert!(body.contains("/opt/cliptray"));
             assert!(body.contains("<string>daemon</string>"));
             assert!(body.contains(MAC_LABEL));
         } else {
-            assert!(body.contains("Exec=\"/opt/splay\" daemon"));
+            assert!(body.contains("Exec=\"/opt/cliptray\" daemon"));
         }
         apply_in(home.path(), false, program).unwrap();
         assert!(!path.exists());

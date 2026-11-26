@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# 在 macOS 上把 splay 打成 .app，并压缩成 zip。
-# 图标使用 assets/splay.svg，和 deb 包是同一张图。
+# 在 macOS 上把 Cliptray 打成 .app，并压缩成 zip。
+# 图标使用 assets/cliptray.svg，和 deb 包是同一张图。
 # macOS 上注册全局热键（默认 ⇧⌘C）。自动粘贴还没实现，选中条目后请手动 ⌘V。
 # 用法：./package-mac.sh
-# 产物：dist/splay.app
-#       dist/splay_<版本>_macos_<架构>.zip
+# 产物：dist/Cliptray.app
+#       dist/Cliptray_<版本>_macos_<架构>.zip
 set -eu
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -29,7 +29,7 @@ if [ -z "$version" ]; then
 fi
 
 arch=$(uname -m)
-svg="$root/assets/splay.svg"
+svg="$root/assets/cliptray.svg"
 if [ ! -f "$svg" ]; then
   printf '找不到图标：%s\n' "$svg" >&2
   exit 1
@@ -37,29 +37,29 @@ fi
 
 printf '正在编译发布版本…\n'
 cargo build --release --locked
-bin="$root/target/release/splay"
+bin="$root/target/release/cliptray"
 
-app="$root/dist/splay.app"
+app="$root/dist/Cliptray.app"
 rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 
-install -m 0755 "$bin" "$app/Contents/MacOS/splay"
-strip -x "$app/Contents/MacOS/splay" 2>/dev/null || true
+install -m 0755 "$bin" "$app/Contents/MacOS/cliptray"
+strip -x "$app/Contents/MacOS/cliptray" 2>/dev/null || true
 
-# 双击 .app 时没有命令行参数，用一个启动脚本转成 `splay daemon`。
-# 直接执行 Contents/MacOS/splay 仍然可以当命令行工具用。
-cat > "$app/Contents/MacOS/splay-launcher" <<'EOF'
+# 双击 .app 时没有命令行参数，用一个启动脚本转成 `cliptray daemon`。
+# 直接执行 Contents/MacOS/cliptray 仍然可以当命令行工具用。
+cat > "$app/Contents/MacOS/cliptray-launcher" <<'EOF'
 #!/bin/sh
 dir=$(dirname "$0")
-exec "$dir/splay" daemon
+exec "$dir/cliptray" daemon
 EOF
-chmod 0755 "$app/Contents/MacOS/splay-launcher"
+chmod 0755 "$app/Contents/MacOS/cliptray-launcher"
 
 # 先栅格化最大尺寸，再缩小，避免每个尺寸都重新渲染。
 icon_tmp=$(mktemp -d)
 trap 'rm -rf "$icon_tmp"' EXIT
 qlmanage -t -s 1024 -o "$icon_tmp" "$svg" >/dev/null
-rendered="$icon_tmp/splay.svg.png"
+rendered="$icon_tmp/cliptray.svg.png"
 master="$icon_tmp/icon.png"
 if [ ! -f "$rendered" ]; then
   printf '无法从 SVG 生成图标\n' >&2
@@ -96,17 +96,17 @@ cat > "$app/Contents/Info.plist" <<EOF
   <key>CFBundleDevelopmentRegion</key>
   <string>zh_CN</string>
   <key>CFBundleDisplayName</key>
-  <string>splay</string>
+  <string>Cliptray</string>
   <key>CFBundleExecutable</key>
-  <string>splay-launcher</string>
+  <string>cliptray-launcher</string>
   <key>CFBundleIconFile</key>
   <string>AppIcon</string>
   <key>CFBundleIdentifier</key>
-  <string>com.splay.app</string>
+  <string>com.cliptray.app</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
-  <string>splay</string>
+  <string>Cliptray</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
@@ -130,7 +130,7 @@ if command -v codesign >/dev/null 2>&1; then
   codesign --force --deep --sign - "$app"
 fi
 
-zip="$root/dist/splay_${version}_macos_${arch}.zip"
+zip="$root/dist/Cliptray_${version}_macos_${arch}.zip"
 rm -f "$zip"
 ditto -c -k --keepParent "$app" "$zip"
 printf '已生成 %s\n' "$app"

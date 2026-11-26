@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 在 macOS 和 Linux 上重新编译并启动 splay 守护进程。
+# 在 macOS 和 Linux 上重新编译并启动 Cliptray 守护进程。
 # 用法：
 #   ./restart.sh                   调试构建并启动 daemon
 #   ./restart.sh --release         发布构建后再启动
@@ -39,7 +39,7 @@ if [ "$#" -eq 0 ]; then
   set -- daemon
 fi
 
-pattern="$root/target/(debug|release)/splay( |$)"
+pattern="$root/target/(debug|release)/cliptray( |$)"
 
 stop_running() {
   if ! command -v pgrep >/dev/null 2>&1; then
@@ -50,7 +50,7 @@ stop_running() {
   if [ -z "$pids" ]; then
     return 0
   fi
-  printf '停止已在运行的 splay：%s\n' "$pids"
+  printf '停止已在运行的 Cliptray：%s\n' "$pids"
   # SIGTERM 会让 daemon 清理 socket 并退出。
   # shellcheck disable=SC2086
   kill $pids 2>/dev/null || true
@@ -86,6 +86,6 @@ printf '正在编译（%s）…\n' "$profile"
 # shellcheck disable=SC2086
 cargo build $cargo_args
 
-bin="$root/target/$profile/splay"
+bin="$root/target/$profile/cliptray"
 printf '启动 %s %s\n' "$bin" "$*"
 exec "$bin" "$@"

@@ -52,7 +52,7 @@ pub fn session() -> Session {
 
 /// 注册全局热键并运行 `body`，`body` 收到注册结果。注册成功后每次触发向 `tx` 发送一个 `()`。
 /// 应在主线程调用：macOS 的 Carbon 事件必须由主线程分发，那里 `body` 会被放到工作线程上运行。
-/// X11 和 macOS 由应用自己注册；纯 Wayland 不允许，需要把 `splay toggle` 绑定到桌面环境的快捷键。
+/// X11 和 macOS 由应用自己注册；纯 Wayland 不允许，需要把 `cliptray toggle` 绑定到桌面环境的快捷键。
 pub fn run_with_hotkey<R: Send + 'static>(
     spec: &HotkeySpec,
     tx: Sender<()>,

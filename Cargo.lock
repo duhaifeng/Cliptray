@@ -594,6 +594,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "cliptray"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arboard",
+ "chrono",
+ "clap",
+ "directories",
+ "eframe",
+ "image",
+ "ksni",
+ "libc",
+ "raw-window-handle",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "toml 1.2.2+spec-1.1.0",
+ "tray-icon",
+ "winit",
+ "x11rb 0.14.0",
+ "zbus",
+]
+
+[[package]]
 name = "codespan-reporting"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3233,32 +3259,6 @@ checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "splay"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arboard",
- "chrono",
- "clap",
- "directories",
- "eframe",
- "image",
- "ksni",
- "libc",
- "raw-window-handle",
- "rusqlite",
- "serde",
- "serde_json",
- "sha2",
- "tempfile",
- "toml 1.2.2+spec-1.1.0",
- "tray-icon",
- "winit",
- "x11rb 0.14.0",
- "zbus",
 ]
 
 [[package]]

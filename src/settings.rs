@@ -1,6 +1,6 @@
 //! 设置窗口。对应 iCopy 点菜单栏图标后的 Setting。
 //!
-//! 侧边栏只放 splay 已经有行为的页：剪切板、通用设置、黑名单。
+//! 侧边栏只放 Cliptray 已经有行为的页：剪切板、通用设置、黑名单。
 //! 免费 Apps、购买是推广；快捷回复、备份、剪切板堆栈这三项功能本身还没有复刻。
 //! 外观见 `settings_ui`。
 
@@ -61,8 +61,8 @@ const DISK_MB: &[u64] = &[0, 100, 512, 1024, 2048, 5120];
 
 pub fn run(cfg: Config, paths: Paths) -> Result<()> {
     let viewport = egui::ViewportBuilder::default()
-        .with_title("splay")
-        .with_app_id("splay-settings")
+        .with_title("Cliptray")
+        .with_app_id("cliptray-settings")
         .with_inner_size([920.0, 780.0])
         .with_min_inner_size([760.0, 560.0])
         .with_resizable(true)
@@ -86,7 +86,7 @@ pub fn run(cfg: Config, paths: Paths) -> Result<()> {
         ..Default::default()
     };
     eframe::run_native(
-        "splay",
+        "Cliptray",
         options,
         Box::new(move |cc| {
             let have_cjk = picker::install_system_fonts(&cc.egui_ctx);
@@ -245,7 +245,7 @@ impl SettingsApp {
             ui_kit::app_logo(ui.painter(), rect);
             ui.add_space(6.0);
             ui.label(
-                RichText::new(format!("splay: {}", env!("CARGO_PKG_VERSION")))
+                RichText::new(format!("Cliptray: {}", env!("CARGO_PKG_VERSION")))
                     .size(13.0)
                     .color(ui_kit::TEXT),
             );

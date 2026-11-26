@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=splay
+Name=Cliptray
 Comment=Clipboard history (iCopy for Linux)
-Exec=splay daemon
+Exec=cliptray daemon
 Terminal=false
 X-GNOME-Autostart-enabled=true

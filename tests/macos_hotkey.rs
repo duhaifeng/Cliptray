@@ -7,8 +7,8 @@ fn main() {
     use std::sync::mpsc;
     use std::time::Duration;
 
-    use splay::hotkey::HotkeySpec;
-    use splay::platform::run_with_hotkey;
+    use cliptray::hotkey::HotkeySpec;
+    use cliptray::platform::run_with_hotkey;
 
     let (tx, _rx) = mpsc::channel();
     let spec: HotkeySpec = "shift+cmd+c".parse().unwrap();

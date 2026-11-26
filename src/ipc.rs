@@ -1,6 +1,6 @@
 //! 守护进程的本地控制通道（Unix socket，一行一条命令）以及选择面板的返回协议。
 //!
-//! Wayland 不允许应用抓取全局热键，用户在桌面环境里把快捷键绑定到 `splay toggle`，
+//! Wayland 不允许应用抓取全局热键，用户在桌面环境里把快捷键绑定到 `cliptray toggle`，
 //! 它经由这里唤起面板；X11 下的内置热键走的是同一个 `Toggle`。
 
 use std::fs;
@@ -87,7 +87,7 @@ pub fn bind(path: &Path) -> Result<UnixListener> {
     }
     if path.exists() {
         if UnixStream::connect(path).is_ok() {
-            bail!("splay 守护进程已在运行（{}）", path.display());
+            bail!("Cliptray 守护进程已在运行（{}）", path.display());
         }
         fs::remove_file(path)
             .with_context(|| format!("清理遗留 socket 失败: {}", path.display()))?;
@@ -140,7 +140,7 @@ fn handle(stream: UnixStream, tx: &Sender<Request>) -> Result<()> {
 pub fn send(path: &Path, cmd: Command) -> Result<String> {
     let stream = UnixStream::connect(path).with_context(|| {
         format!(
-            "连接不上 splay 守护进程（{}）。先运行 `splay daemon`",
+            "连接不上 Cliptray 守护进程（{}）。先运行 `cliptray daemon`",
             path.display()
         )
     })?;
@@ -222,6 +222,6 @@ mod tests {
     fn client_without_daemon_gives_actionable_error() {
         let d = tempfile::tempdir().unwrap();
         let err = send(&d.path().join("none.sock"), Command::Status).unwrap_err();
-        assert!(format!("{err:#}").contains("splay daemon"));
+        assert!(format!("{err:#}").contains("cliptray daemon"));
     }
 }

@@ -1,8 +1,8 @@
-# splay
+# Cliptray
 
 [English](README.md)
 
-splay 记住你复制过的内容，并在屏幕底部铺成一排卡片。按 **Shift+Super+C**（Mac 上是 ⇧⌘C）打开这条卡片，选中一项，粘贴回刚才的窗口。
+Cliptray 记住你复制过的内容，并在屏幕底部铺成一排卡片。按 **Shift+Super+C**（Mac 上是 ⇧⌘C）打开这条卡片，选中一项，粘贴回刚才的窗口。
 
 这是用 Rust 写的剪切板历史工具，交互参照 [iCopy](https://icopy.better365.cn)，运行在 Linux 和 macOS 上。
 
@@ -12,20 +12,20 @@ splay 记住你复制过的内容，并在屏幕底部铺成一排卡片。按 *
 
 ## 安装
 
-**Debian / Ubuntu（amd64）。** 从[最新 Release](https://github.com/duhaifeng/splay/releases/latest) 下载 `splay_0.1.0_amd64.deb`：
+**Debian / Ubuntu（amd64）。** 从[最新 Release](https://github.com/duhaifeng/Cliptray/releases/latest) 下载 `cliptray_0.1.0_amd64.deb`：
 
 ```bash
-sudo dpkg -i splay_0.1.0_amd64.deb
+sudo dpkg -i cliptray_0.1.0_amd64.deb
 ```
 
-包会装上 `/usr/bin/splay`、应用菜单入口，以及一份 XDG 自动启动项。systemd 用户单元会装上，但默认不启用，避免和自动启动项各拉起一个进程。
+包会装上 `/usr/bin/cliptray`、应用菜单入口，以及一份 XDG 自动启动项。systemd 用户单元会装上，但默认不启用，避免和自动启动项各拉起一个进程。
 
 **从源码安装。** 需要 Rust 和 C 编译器（SQLite 随源码编译进去）。
 
 ```bash
 cargo install --path .
-splay doctor    # 检查会话、热键、剪切板、中日韩字体
-splay daemon    # 前台运行
+cliptray doctor    # 检查会话、热键、剪切板、中日韩字体
+cliptray daemon    # 前台运行
 ```
 
 面板运行时需要 libxkbcommon、X11 或 Wayland 客户端库、OpenGL 或 EGL，以及一种中日韩字体（例如 `fonts-noto-cjk`）。没有这种字体时界面退回英文，中文会画成方框。
@@ -61,19 +61,19 @@ splay daemon    # 前台运行
 ## 命令
 
 ```
-splay daemon                 常驻进程，带菜单栏图标
-splay toggle | show | hide   唤出或关闭面板
-splay settings               打开设置
-splay status | quit
-splay list [--tag text] [--search 词] [--limit 20]
-splay clear [--tag all] [--keep-favorites] --yes
-splay config path | show | init [--force]   # --force 会先备份旧文件
-splay doctor
+cliptray daemon                 常驻进程，带菜单栏图标
+cliptray toggle | show | hide   唤出或关闭面板
+cliptray settings               打开设置
+cliptray status | quit
+cliptray list [--tag text] [--search 词] [--limit 20]
+cliptray clear [--tag all] [--keep-favorites] --yes
+cliptray config path | show | init [--force]   # --force 会先备份旧文件
+cliptray doctor
 ```
 
 ## 配置
 
-`~/.config/splay/config.toml`。缺的字段用默认值。`splay config show` 打印当前生效的值。
+`~/.config/cliptray/config.toml`。缺的字段用默认值。`cliptray config show` 打印当前生效的值。
 
 ```toml
 hotkey = "shift+super+c"      # cmd、command、meta、win 都是 super 的别名
@@ -94,26 +94,26 @@ show_status_item = true
 launch_at_startup = false     # 下次登录时启动。macOS 写 LaunchAgent，Linux 写 XDG autostart
 ```
 
-历史在 `~/.local/share/splay/`：`data.sqlite`、放图片的 `tempFiles/`、来源应用图标 `icons/`，以及上次分类 `last_tag`。
+历史在 `~/.local/share/cliptray/`：`data.sqlite`、放图片的 `tempFiles/`、来源应用图标 `icons/`，以及上次分类 `last_tag`。
 
 ## Linux 与 macOS
 
 | | X11 | Wayland | macOS |
 | --- | --- | --- | --- |
-| 全局热键 | splay 自己抓取 | GNOME 用自带的 Shell 扩展 `splay@splay.local`。其他合成器不能抓取，把 Shift+Super+C 绑到 `splay toggle` | Carbon 热键。要自动粘贴，启动守护进程的程序需要辅助功能权限 |
+| 全局热键 | Cliptray 自己抓取 | GNOME 用自带的 Shell 扩展 `cliptray@cliptray.local`。其他合成器不能抓取，把 Shift+Super+C 绑到 `cliptray toggle` | Carbon 热键。要自动粘贴，启动守护进程的程序需要辅助功能权限 |
 | 粘贴 | XTest | GNOME 用 Mutter RemoteDesktop。其他合成器需要 `wtype` | 授予辅助功能权限后用 CGEvent。否则只写入剪切板 |
 | 来源应用和黑名单 | `WM_CLASS` | 识别不到，黑名单不生效 | 应用名 |
 | 剪切板监控 | 可以 | 需要合成器提供 data-control 协议 | 可以 |
 
-`splay doctor` 会告诉你当前会话实际能做什么。GNOME Wayland 上，守护进程第一次启动时把扩展写到 `~/.local/share/gnome-shell/extensions/`。Shell 要到下一次登录才加载新扩展，在那之前热键不会生效。`SPLAY_BACKEND=x11` 可以强制走 X11。
+`cliptray doctor` 会告诉你当前会话实际能做什么。GNOME Wayland 上，守护进程第一次启动时把扩展写到 `~/.local/share/gnome-shell/extensions/`。Shell 要到下一次登录才加载新扩展，在那之前热键不会生效。`CLIPTRAY_BACKEND=x11` 可以强制走 X11。
 
-macOS 安装包用 `./package-mac.sh` 生成（`dist/splay.app` 和 zip）。Linux amd64 的包用 `./package-deb.sh` 生成。
+macOS 安装包用 `./package-mac.sh` 生成（`dist/Cliptray.app` 和 zip）。Linux amd64 的包用 `./package-deb.sh` 生成。
 
 ## 编译
 
 ```bash
 cargo test
-./package-deb.sh    # dist/splay_<版本>_amd64.deb
+./package-deb.sh    # dist/cliptray_<版本>_amd64.deb
 ./package-mac.sh    # 在 macOS 上
 ```
 

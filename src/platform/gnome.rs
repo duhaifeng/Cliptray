@@ -1,8 +1,8 @@
 //! GNOME Shell + Wayland 下的全局热键。
 //!
 //! Wayland 客户端收不到全局按键，XWayland 的 `XGrabKey` 也只在焦点是 X11 窗口时有效，
-//! 所以由 `gnome/splay@splay.local` 这个 Shell 扩展替我们抓，
-//! 本模块通过 session bus 上的 `local.splay.Shell` 驱动它：
+//! 所以由 `gnome/cliptray@cliptray.local` 这个 Shell 扩展替我们抓，
+//! 本模块通过 session bus 上的 `local.cliptray.Shell` 驱动它：
 //! 调 `SetShortcuts` 注册，收 `Shortcut` 信号触发，扩展（重新）启动时收 `Ready` 重新注册。
 
 use std::path::{Path, PathBuf};
@@ -16,25 +16,25 @@ use zbus::blocking::{Connection, Proxy};
 
 use crate::hotkey::HotkeySpec;
 
-const BUS_NAME: &str = "local.splay.Shell";
-const OBJECT_PATH: &str = "/local/splay/Shell";
-const INTERFACE: &str = "local.splay.Shell";
+const BUS_NAME: &str = "local.cliptray.Shell";
+const OBJECT_PATH: &str = "/local/cliptray/Shell";
+const INTERFACE: &str = "local.cliptray.Shell";
 /// 守护进程持有的名字；扩展靠它知道什么时候该释放热键。
-const DAEMON_NAME: &str = "local.splay.Daemon";
+const DAEMON_NAME: &str = "local.cliptray.Daemon";
 
-const EXTENSION_UUID: &str = "splay@splay.local";
+const EXTENSION_UUID: &str = "cliptray@cliptray.local";
 const SYSTEM_EXTENSION_DIR: &str = "/usr/share/gnome-shell/extensions";
-/// 与 `gnome/splay@splay.local/extension.js` 的 EXTENSION_VERSION 一致。
+/// 与 `gnome/cliptray@cliptray.local/extension.js` 的 EXTENSION_VERSION 一致。
 const EXTENSION_VERSION: u32 = 1;
-const EXTENSION_METADATA: &str = include_str!("../../gnome/splay@splay.local/metadata.json");
-const EXTENSION_SCRIPT: &str = include_str!("../../gnome/splay@splay.local/extension.js");
+const EXTENSION_METADATA: &str = include_str!("../../gnome/cliptray@cliptray.local/metadata.json");
+const EXTENSION_SCRIPT: &str = include_str!("../../gnome/cliptray@cliptray.local/extension.js");
 
 /// 启动时 Shell 可能还在加载扩展（登录后自启动），最多等这么久。
 const LOGIN_PATIENCE: Duration = Duration::from_secs(8);
 
-/// 当前是 GNOME 的 Wayland 会话。`SPLAY_BACKEND=x11` 可以强制走 X11。
+/// 当前是 GNOME 的 Wayland 会话。`CLIPTRAY_BACKEND=x11` 可以强制走 X11。
 pub fn is_gnome_wayland() -> bool {
-    if std::env::var("SPLAY_BACKEND").is_ok_and(|v| v.eq_ignore_ascii_case("x11")) {
+    if std::env::var("CLIPTRAY_BACKEND").is_ok_and(|v| v.eq_ignore_ascii_case("x11")) {
         return false;
     }
     let wayland = std::env::var("XDG_SESSION_TYPE")
@@ -57,7 +57,7 @@ pub fn spawn_hotkey_listener(spec: &HotkeySpec, tx: Sender<()>) -> Result<Rebind
     // 先占名字再抓热键：扩展看到名字消失就会释放热键。
     connection
         .request_name(DAEMON_NAME)
-        .with_context(|| format!("无法占用 D-Bus 名字 {DAEMON_NAME}（已有 splay 在运行？）"))?;
+        .with_context(|| format!("无法占用 D-Bus 名字 {DAEMON_NAME}（已有 Cliptray 在运行？）"))?;
     // (accelerator, 给人看的写法)；信号线程和换热键的调用共用。
     let current = Arc::new(Mutex::new((spec.gnome_accelerator(), spec.to_string())));
     {
@@ -136,10 +136,10 @@ fn check_version(proxy: &Proxy<'_>) {
         Ok(EXTENSION_VERSION) => {}
         found => {
             eprintln!(
-                "GNOME Shell 里运行的 splay 扩展版本是 {found:?}，期望 {EXTENSION_VERSION}；\
+                "GNOME Shell 里运行的 Cliptray 扩展版本是 {found:?}，期望 {EXTENSION_VERSION}；\
                  注销再登录一次才会加载新版本"
             );
-            notify("splay 扩展已更新，请注销再登录一次让 GNOME 加载新版本。");
+            notify("Cliptray 扩展已更新，请注销再登录一次让 GNOME 加载新版本。");
         }
     }
 }
@@ -166,7 +166,7 @@ fn connect(connection: &Connection) -> Result<Proxy<'static>> {
     }
     let hint = match setup {
         Ok(true) => {
-            notify("已安装 splay 的 GNOME 扩展，请注销再登录一次以启用全局热键。");
+            notify("已安装 Cliptray 的 GNOME 扩展，请注销再登录一次以启用全局热键。");
             "已安装并启用 GNOME 扩展，但 Wayland 下 Shell 不能热重启：注销再登录一次后生效"
                 .to_owned()
         }
@@ -181,7 +181,7 @@ fn connect(connection: &Connection) -> Result<Proxy<'static>> {
 /// 桌面通知；失败不算错误。
 fn notify(body: &str) {
     let _ = Command::new("notify-send")
-        .args(["-a", "splay", "splay", body])
+        .args(["-a", "Cliptray", "Cliptray", body])
         .status();
 }
 

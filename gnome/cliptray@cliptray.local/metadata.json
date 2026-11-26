@@ -1,0 +1,7 @@
+{
+  "uuid": "cliptray@cliptray.local",
+  "name": "Cliptray",
+  "description": "Global shortcut backend for Cliptray on GNOME Wayland. Lets the Cliptray daemon grab a global shortcut through the Shell.",
+  "shell-version": ["50"],
+  "session-modes": ["user"]
+}

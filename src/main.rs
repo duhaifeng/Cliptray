@@ -4,20 +4,20 @@ use std::process::ExitCode;
 use anyhow::{Context, Result, bail};
 use clap::{Parser, Subcommand};
 
-use splay::config::{Config, Paths};
-use splay::ipc::{self, Command};
-use splay::model::Tag;
-use splay::store::{Query, Store};
-use splay::{daemon, i18n, picker, platform};
+use cliptray::config::{Config, Paths};
+use cliptray::ipc::{self, Command};
+use cliptray::model::Tag;
+use cliptray::store::{Query, Store};
+use cliptray::{daemon, i18n, picker, platform};
 
 #[derive(Parser)]
 #[command(
-    name = "splay",
+    name = "cliptray",
     version,
-    about = "剪切板历史工具（iCopy 的 Linux 复刻）"
+    about = "Cliptray：剪切板历史工具（iCopy 的 Linux 复刻）"
 )]
 struct Cli {
-    /// 配置文件路径，默认 ~/.config/splay/config.toml
+    /// 配置文件路径，默认 ~/.config/cliptray/config.toml
     #[arg(long, global = true)]
     config: Option<PathBuf>,
     #[command(subcommand)]
@@ -116,7 +116,7 @@ fn run() -> Result<()> {
         Cmd::Hide => send(&paths, Command::Hide),
         Cmd::Status => send(&paths, Command::Status),
         Cmd::Quit => send(&paths, Command::Quit),
-        Cmd::Settings => splay::settings::run(cfg, paths),
+        Cmd::Settings => cliptray::settings::run(cfg, paths),
         Cmd::List { tag, search, limit } => list(&paths, &cfg, &tag, search, limit),
         Cmd::Clear {
             tag,
@@ -155,7 +155,7 @@ fn list(
         text: search,
         limit,
         offset: 0,
-        cutoff: cfg.cutoff(splay::store::now_secs()),
+        cutoff: cfg.cutoff(cliptray::store::now_secs()),
     };
     let items = store.query(&q)?;
     let now = chrono::Local::now();
@@ -243,14 +243,14 @@ fn doctor(cfg: &Config, paths: &Paths, config_path: &std::path::Path) -> Result<
         )),
         cfg.hotkey,
         match session {
-            platform::Session::X11 => "X11 下由 splay 直接抓取",
+            platform::Session::X11 => "X11 下由 Cliptray 直接抓取",
             platform::Session::Macos => "macOS 使用 Carbon 全局热键",
             platform::Session::Wayland =>
-                "Wayland 不允许；请在桌面环境里把快捷键绑定到 `splay toggle`",
+                "Wayland 不允许；请在桌面环境里把快捷键绑定到 `cliptray toggle`",
             platform::Session::Unknown => "未检测到图形会话（DISPLAY / WAYLAND_DISPLAY 均未设置）",
         }
     );
-    let clip = splay::clipboard::SystemClipboard::new();
+    let clip = cliptray::clipboard::SystemClipboard::new();
     println!(
         "[{}] 剪切板访问{}",
         ok(clip.is_ok()),
@@ -277,7 +277,7 @@ fn doctor(cfg: &Config, paths: &Paths, config_path: &std::path::Path) -> Result<
         }
         platform::Session::Macos => (
             false,
-            "需要在「系统设置 → 隐私与安全性 → 辅助功能」里允许启动守护进程的程序（终端 / Cursor / splay.app）",
+            "需要在「系统设置 → 隐私与安全性 → 辅助功能」里允许启动守护进程的程序（终端 / Cursor / Cliptray.app）",
         ),
         platform::Session::Unknown => (false, "未检测到图形会话，无法自动粘贴"),
     };

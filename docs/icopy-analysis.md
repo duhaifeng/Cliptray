@@ -72,16 +72,16 @@
 - 存储时间是等距刻度的滑块：Day、Week、Month、Quarter、Half a year、Year、Unlimited，当前档位上方有蓝色图钉，刻度文字是青绿色。
 - General 页的下方有「Permissions」卡片（授权说明和三条链接）以及右对齐的「Restore Default Settings」「Initialization」。Black list 页是两张表（剪切板监听、快捷键操作），各带 `+` / `-`。
 - REA `inspect-native-dispatch-metadata`（同一份 Evidence，重跑 `--max-records 20000` 仍是 599 个类）读到的结构：`SettingViewController` 有 `bgView`、`splitView`（`SettingSplitView`）、`menuVc`；`MenuViewController` 有 `effectView`、`iconView`、`versionView`、`payBtn`、`currentBtn`；`MenuButton` 有 `imgView`、`titleLabel`；`ShortcutViewController` 有 `box1View`…`box4View`；`GeneralViewController` 有 `box1View`、`box2View`；`BlackListViewController` 有 `pasteTableView`、`operateTableView` 和各自的删除按钮；`PasteHistorySlider` 有 `indicatorView`、`modelArr`。
-- `Assets.car` 里有 `paste_icon`、`reply_icon`、`general_icon`、`blacklist_icon`、`iCloud_icon`、`study_icon`、`apps_icon`、`contact_icon`、`shortcut_icon`、`stack_icon`、`display_icon`、`history_icon`、`style_icon` 等 rendition，对应侧栏和分区标题的图标。REA 不解码图像字节，所以 splay 的图标是自画的。
+- `Assets.car` 里有 `paste_icon`、`reply_icon`、`general_icon`、`blacklist_icon`、`iCloud_icon`、`study_icon`、`apps_icon`、`contact_icon`、`shortcut_icon`、`stack_icon`、`display_icon`、`history_icon`、`style_icon` 等 rendition，对应侧栏和分区标题的图标。REA 不解码图像字节，所以 Cliptray 的图标是自画的。
 - 本地化表里有 `Interaction Settings`（交互设置）、`Clipboard History Limit`（剪切板历史记录限制）、`Permissions`、`Restore Default Settings`、`Initialization`；「剪切板监听黑名单」出现在 `pasteBlackList.data` 的说明里。
 
 **推断**
-- 毛玻璃侧栏来自 `effectView`（`NSVisualEffectView` 的常见命名），没有读到它的 material。splay 用纯色近似。
+- 毛玻璃侧栏来自 `effectView`（`NSVisualEffectView` 的常见命名），没有读到它的 material。Cliptray 用纯色近似。
 - 窗口内的光晕背景应是 `bgView` 上的图片（`window_bg_*`），没有复刻。
 
 **未复刻**
-- Clipboard Stack、Show Settings（横向 / 纵向样式、文本预览、默认焦点）、Double Click / Fn 修饰键热键、音效、Permissions 卡片、Theme、Preference Panel Shortcut、Toggle Image Button Tooltip；splay 没有对应功能。
-- Black list 的第二张表（快捷键操作黑名单）；splay 的快捷键不按来源应用过滤。
+- Clipboard Stack、Show Settings（横向 / 纵向样式、文本预览、默认焦点）、Double Click / Fn 修饰键热键、音效、Permissions 卡片、Theme、Preference Panel Shortcut、Toggle Image Button Tooltip；Cliptray 没有对应功能。
+- Black list 的第二张表（快捷键操作黑名单）；Cliptray 的快捷键不按来源应用过滤。
 
 **推断**
 - `showApps` 对应 Free Apps，`MenuViewController` 的 `pay` 对应 Buy。这两项是推广。
@@ -109,9 +109,9 @@
 
 ## 复刻对照
 
-| iCopy | splay | 说明 |
+| iCopy | Cliptray | 说明 |
 | --- | --- | --- |
-| ⇧⌘C 唤出面板 | `shift+super+c`（可配置） | X11 内置抓取；Wayland 需绑定 `splay toggle` |
+| ⇧⌘C 唤出面板 | `shift+super+c`（可配置） | X11 内置抓取；Wayland 需绑定 `cliptray toggle` |
 | 文本 / 富文本 / 图片 / 文件 / 多文件 | 同 | 分组仿照 iCopy 的查询；类型数值与库内 `data` 格式自定，不能与 iCopy 的库互读 |
 | 搜索、分类标签、分页 | 同 | |
 | 收藏 | 同 | 收藏不受保留期与磁盘上限清理 |

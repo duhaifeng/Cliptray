@@ -1,7 +1,0 @@
-{
-  "uuid": "splay@splay.local",
-  "name": "splay",
-  "description": "Global shortcut backend for splay on GNOME Wayland. Lets the splay daemon grab a global shortcut through the Shell.",
-  "shell-version": ["50"],
-  "session-modes": ["user"]
-}
