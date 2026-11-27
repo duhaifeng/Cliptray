@@ -4,7 +4,7 @@
 
 Cliptray keeps a history of what you copy and shows it as a row of cards along the bottom of the screen. Press **Shift+Super+C** (⇧⌘C on a Mac) to open the strip, pick an item, and paste it back into the window you were using.
 
-It is a Rust clipboard history tool in the spirit of [iCopy](https://icopy.better365.cn), for Linux and macOS.
+The project mainly brings [iCopy](https://icopy.better365.cn) on macOS to Linux. It is written in Rust, and it also runs on macOS.
 
 ![History strip along the bottom of the screen](docs/images/panel.png)
 
@@ -20,10 +20,10 @@ If it will not open, macOS has quarantined the download. In the directory that c
 xattr -dr com.apple.quarantine Cliptray.app
 ```
 
-**Debian / Ubuntu (amd64).** Download `splay_0.1.0_amd64.deb` from the [v0.1.0 release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.0):
+**Debian / Ubuntu (amd64).** Download `cliptray_0.1.2_amd64.deb` from the [v0.1.2 release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.2):
 
 ```bash
-sudo dpkg -i splay_0.1.0_amd64.deb
+sudo dpkg -i cliptray_0.1.2_amd64.deb
 ```
 
 The package installs `/usr/bin/cliptray`, an application menu entry, and an XDG autostart file. A systemd user unit is installed but not enabled, so it does not start a second daemon next to the autostart entry.

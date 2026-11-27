@@ -4,7 +4,7 @@
 
 Cliptray 记住你复制过的内容，并在屏幕底部铺成一排卡片。按 **Shift+Super+C**（Mac 上是 ⇧⌘C）打开这条卡片，选中一项，粘贴回刚才的窗口。
 
-这是用 Rust 写的剪切板历史工具，交互参照 [iCopy](https://icopy.better365.cn)，运行在 Linux 和 macOS 上。
+这个项目主要是把 macOS 上的 [iCopy](https://icopy.better365.cn) 复刻到 Linux。用 Rust 写成，在 macOS 上也能运行。
 
 ![贴在屏幕底部的历史卡片条](docs/images/panel.png)
 
@@ -20,10 +20,10 @@ Cliptray 记住你复制过的内容，并在屏幕底部铺成一排卡片。�
 xattr -dr com.apple.quarantine Cliptray.app
 ```
 
-**Debian / Ubuntu（amd64）。** 从 [v0.1.0 Release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.0) 下载 `splay_0.1.0_amd64.deb`：
+**Debian / Ubuntu（amd64）。** 从 [v0.1.2 Release](https://github.com/duhaifeng/Cliptray/releases/tag/v0.1.2) 下载 `cliptray_0.1.2_amd64.deb`：
 
 ```bash
-sudo dpkg -i splay_0.1.0_amd64.deb
+sudo dpkg -i cliptray_0.1.2_amd64.deb
 ```
 
 包会装上 `/usr/bin/cliptray`、应用菜单入口，以及一份 XDG 自动启动项。systemd 用户单元会装上，但默认不启用，避免和自动启动项各拉起一个进程。

@@ -169,8 +169,9 @@ Depends: $depends
 Recommends: libgl1, libegl1, libx11-6, libxkbcommon0, libxkbcommon-x11-0, libwayland-client0, fonts-noto-cjk | fonts-wqy-microhei
 Suggests: wtype
 Homepage: https://github.com/duhaifeng/Cliptray
-Description: Cliptray clipboard history manager with a popup picker
- 记录文本、图片、文件的剪切板历史，按 Shift+Super+C 弹出面板选择并粘贴。
+Description: Linux port of iCopy's macOS clipboard history
+ 把 macOS 上 iCopy 的剪切板历史功能复刻到 Linux。
+ 记录文本、图片、文件，按 Shift+Super+C 弹出面板选择并粘贴。
  X11 下注册全局热键并自动粘贴；Wayland 下请把桌面快捷键绑定到
  "cliptray toggle"，自动粘贴需要安装 wtype。
 EOF

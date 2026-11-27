@@ -1,8 +1,9 @@
 [package]
 name = "cliptray"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MIT"
+description = "把 macOS 上 iCopy 的剪切板历史功能复刻到 Linux"
 
 [dependencies]
 anyhow = "1.0.105"

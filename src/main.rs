@@ -14,7 +14,7 @@ use cliptray::{daemon, i18n, picker, platform};
 #[command(
     name = "cliptray",
     version,
-    about = "Cliptray：剪切板历史工具（iCopy 的 Linux 复刻）"
+    about = "把 macOS 上 iCopy 的剪切板历史功能复刻到 Linux"
 )]
 struct Cli {
     /// 配置文件路径，默认 ~/.config/cliptray/config.toml
