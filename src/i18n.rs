@@ -121,6 +121,11 @@ impl Lang {
             MenuWord::DoubleClickEnter => ("双击/回车", "Double Click/Enter"),
             MenuWord::HoverSwitch => ("光标悬浮切换分组", "Hover to Switch Group"),
             MenuWord::PastePlain => ("粘贴为纯文本", "Paste as Plain Text"),
+            MenuWord::TrimWhitespace => ("粘贴时清理首尾空白", "Trim whitespace when pasting"),
+            MenuWord::StripStyles => (
+                "粘贴时清理样式，只保留纯文本",
+                "Strip styles when pasting, keep plain text",
+            ),
             MenuWord::AutoClose => (
                 "操作完成后自动关闭窗口",
                 "Auto close window after operation",
@@ -199,6 +204,8 @@ pub enum MenuWord {
     DoubleClickEnter,
     HoverSwitch,
     PastePlain,
+    TrimWhitespace,
+    StripStyles,
     AutoClose,
     DefaultGroup,
     LastGroup,

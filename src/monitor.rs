@@ -9,7 +9,7 @@ use anyhow::Result;
 
 use crate::clipboard::{ClipContent, ClipboardBackend};
 use crate::config::Config;
-use crate::model::{Item, ItemKind, Transform};
+use crate::model::{Item, ItemKind, Transform, strip_style_marks, trim_edge_whitespace};
 use crate::store::{InsertOutcome, Store};
 
 /// 当前前台应用，用于黑名单和来源记录。
@@ -165,6 +165,24 @@ pub fn item_to_content(
             ClipContent::Files(item.files.iter().map(PathBuf::from).collect())
         }
     })
+}
+
+/// 按设置整理即将写回剪切板的文本。历史里仍是原文。
+/// `trim_whitespace` 去掉首尾空行和全半角空格；`strip_styles` 去掉终端转义与 HTML 样式，并丢弃富文本格式。
+pub fn apply_outgoing_filters(cfg: &Config, content: ClipContent) -> ClipContent {
+    match content {
+        ClipContent::Text { mut text, mut html } => {
+            if cfg.strip_styles {
+                text = strip_style_marks(&text);
+                html = None;
+            }
+            if cfg.trim_whitespace {
+                text = trim_edge_whitespace(&text);
+            }
+            ClipContent::Text { text, html }
+        }
+        other => other,
+    }
 }
 
 #[cfg(test)]
@@ -350,6 +368,34 @@ mod tests {
             } => assert_eq!((rgba, width, height), (px, 8, 8)),
             other => panic!("unexpected {other:?}"),
         }
+    }
+
+    #[test]
+    fn outgoing_filters_trim_edges_and_drop_styles() {
+        let rich = ClipContent::Text {
+            text: "\n\u{1b}[32m  <b>hi</b>\u{3000}\n".into(),
+            html: Some("<b>hi</b>".into()),
+        };
+        let cfg = Config {
+            trim_whitespace: true,
+            strip_styles: true,
+            ..Config::default()
+        };
+        assert_eq!(
+            apply_outgoing_filters(&cfg, rich),
+            ClipContent::Text {
+                text: "hi".into(),
+                html: None,
+            }
+        );
+        let keep = ClipContent::Text {
+            text: "\n  x\u{3000}".into(),
+            html: Some("<i>x</i>".into()),
+        };
+        assert_eq!(
+            apply_outgoing_filters(&Config::default(), keep.clone()),
+            keep
+        );
     }
 
     #[test]

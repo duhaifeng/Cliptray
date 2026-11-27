@@ -90,6 +90,8 @@ click_action = "paste"        # paste | copy | select（select 时双击才粘�
 enter_action = "paste"        # paste | copy
 double_click_action = "paste"
 paste_plain_text = true       # 文本以纯文本写回；面板上的 T 可临时切换
+trim_whitespace = false       # 写回时去掉首尾空行、全角/半角空格等空白
+strip_styles = false          # 写回时去掉终端转义码和 HTML 样式，只留纯文本
 hover_switch_group = true     # 悬停分类标签即切换
 default_tag = "last"          # last | all | text | image | file | favorite
 history_days = 0              # 0 = 不限制

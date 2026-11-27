@@ -457,6 +457,20 @@ fn clipboard_page(app: &mut SettingsApp, ui: &mut egui::Ui) {
             |c| &mut c.paste_plain_text,
             false,
         );
+        check(
+            ui,
+            app,
+            MenuWord::TrimWhitespace,
+            |c| &mut c.trim_whitespace,
+            false,
+        );
+        check(
+            ui,
+            app,
+            MenuWord::StripStyles,
+            |c| &mut c.strip_styles,
+            false,
+        );
     });
 
     ui_kit::section_header(

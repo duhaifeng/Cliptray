@@ -90,6 +90,8 @@ click_action = "paste"        # paste | copy | select (select pastes on double c
 enter_action = "paste"        # paste | copy
 double_click_action = "paste"
 paste_plain_text = true       # write text back as plain text; the T button toggles this for the open panel
+trim_whitespace = false       # on write-back, drop leading and trailing blank lines, spaces, and ideographic spaces
+strip_styles = false          # on write-back, drop terminal escapes and HTML styling, keep plain text
 hover_switch_group = true     # hovering a category tab switches to it
 default_tag = "last"          # last | all | text | image | file | favorite
 history_days = 0              # 0 = keep everything

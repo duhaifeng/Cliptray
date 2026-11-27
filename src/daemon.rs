@@ -19,7 +19,9 @@ use crate::config::{Action, Config, Paths};
 use crate::hotkey::HotkeySpec;
 use crate::i18n::{Lang, MenuWord};
 use crate::ipc::{self, Command, Pick, Request};
-use crate::monitor::{ActiveApp, Captured, Monitor, SkipReason, item_to_content};
+use crate::monitor::{
+    ActiveApp, Captured, Monitor, SkipReason, apply_outgoing_filters, item_to_content,
+};
 use crate::platform::{self, MenuAction, StatusIcon, TrayControl, TrayIo, TrayLabels};
 use crate::store::{Store, now_secs};
 
@@ -111,7 +113,10 @@ impl<B: ClipboardBackend> Core<B> {
             .store
             .get(pick.id)?
             .with_context(|| format!("条目 #{} 已不存在", pick.id))?;
-        let content = item_to_content(&item, &self.store, pick.plain, pick.transform)?;
+        let content = apply_outgoing_filters(
+            &self.cfg,
+            item_to_content(&item, &self.store, pick.plain, pick.transform)?,
+        );
         // 先登记再写入：写入后的第一次轮询要认出它是自己的内容。
         self.monitor.note_self_write(&content);
         self.backend.write(&content).context("写入剪切板失败")?;

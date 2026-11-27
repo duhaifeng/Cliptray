@@ -52,6 +52,10 @@ pub struct Config {
     pub double_click_action: Action,
     /// 文本以纯文本写回（iCopy“粘贴为纯文本”，面板工具栏的 T 按钮可临时切换）。
     pub paste_plain_text: bool,
+    /// 写回剪切板时去掉首尾空白：空行、制表符、半角空格、全角空格等。
+    pub trim_whitespace: bool,
+    /// 写回剪切板时去掉终端转义码和 HTML 样式，只留纯文本。
+    pub strip_styles: bool,
     /// 鼠标悬停在分类标签上即切换分类（iCopy“悬停切换分组”）。
     pub hover_switch_group: bool,
     /// 自动粘贴前等待焦点回到原窗口的毫秒数。
@@ -97,6 +101,8 @@ impl Default for Config {
             enter_action: Action::Paste,
             double_click_action: Action::Paste,
             paste_plain_text: true,
+            trim_whitespace: false,
+            strip_styles: false,
             hover_switch_group: true,
             paste_delay_ms: 150,
             default_tag: "last".into(),

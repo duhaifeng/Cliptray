@@ -261,6 +261,378 @@ pub fn digest_parts(kind: ItemKind, parts: &[&[u8]]) -> String {
     hex(&h.finalize())
 }
 
+/// 去掉首尾空白。包括空行、制表符、半角空格、全角空格（U+3000）以及其它 Unicode 空白。
+/// 中间的空白原样保留。
+pub fn trim_edge_whitespace(s: &str) -> String {
+    s.trim().to_owned()
+}
+
+/// 去掉终端样式转义（ANSI / OSC）和 HTML 样式标记，留下可读的纯文本。
+/// 代码里的 `Vec<String>`、`a < b` 这类比较不会被当成标签。
+pub fn strip_style_marks(s: &str) -> String {
+    strip_markup(&strip_ansi(s))
+}
+
+fn strip_ansi(s: &str) -> String {
+    let chars: Vec<char> = s.chars().collect();
+    let mut out = String::with_capacity(s.len());
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] == '\u{1b}' {
+            i += 1;
+            if i >= chars.len() {
+                break;
+            }
+            match chars[i] {
+                '[' => {
+                    i += 1;
+                    while i < chars.len() && !is_csi_final(chars[i]) {
+                        i += 1;
+                    }
+                    if i < chars.len() {
+                        i += 1;
+                    }
+                }
+                ']' => {
+                    i += 1;
+                    while i < chars.len() {
+                        if chars[i] == '\u{7}' {
+                            i += 1;
+                            break;
+                        }
+                        if chars[i] == '\u{1b}' && i + 1 < chars.len() && chars[i + 1] == '\\' {
+                            i += 2;
+                            break;
+                        }
+                        i += 1;
+                    }
+                }
+                '(' | ')' | '*' | '+' => i += 2,
+                _ => i += 1,
+            }
+        } else if chars[i] == '\u{9b}' {
+            i += 1;
+            while i < chars.len() && !is_csi_final(chars[i]) {
+                i += 1;
+            }
+            if i < chars.len() {
+                i += 1;
+            }
+        } else {
+            out.push(chars[i]);
+            i += 1;
+        }
+    }
+    out
+}
+
+fn is_csi_final(c: char) -> bool {
+    matches!(c, '\u{40}'..='\u{7e}')
+}
+
+fn strip_markup(s: &str) -> String {
+    let bytes = s.as_bytes();
+    let mut out = String::with_capacity(s.len());
+    let mut extra = std::collections::HashSet::new();
+    let mut i = 0;
+    let mut stripped_tags = false;
+    while i < bytes.len() {
+        if bytes[i] != b'<' {
+            let ch = s[i..].chars().next().unwrap();
+            if !is_style_format(ch) {
+                out.push(ch);
+            }
+            i += ch.len_utf8();
+            continue;
+        }
+        if s[i..].starts_with("<!--") {
+            if let Some(end) = s[i + 4..].find("-->") {
+                i += 4 + end + 3;
+                stripped_tags = true;
+                continue;
+            }
+        }
+        if s[i..].starts_with("<!") || s[i..].starts_with("<?") {
+            if let Some(end) = s[i..].find('>') {
+                i += end + 1;
+                stripped_tags = true;
+                continue;
+            }
+        }
+        if let Some(tag) = parse_tag(s, i) {
+            let lower = tag.name.to_ascii_lowercase();
+            let known = is_html_tag(&lower);
+            let strip = known || tag.has_attr || extra.contains(&lower);
+            if strip {
+                if !tag.closing && tag.has_attr {
+                    extra.insert(lower.clone());
+                }
+                if (lower == "script" || lower == "style") && !tag.closing {
+                    let close = format!("</{lower}");
+                    let rest = s[tag.end..].to_ascii_lowercase();
+                    if let Some(rel) = rest.find(&close)
+                        && let Some(gt) = s[tag.end + rel..].find('>')
+                    {
+                        i = tag.end + rel + gt + 1;
+                        stripped_tags = true;
+                        continue;
+                    }
+                }
+                if is_break_tag(&lower) && (tag.closing || lower == "br" || lower == "hr") {
+                    if !out.ends_with('\n') {
+                        out.push('\n');
+                    }
+                }
+                i = tag.end;
+                stripped_tags = true;
+                continue;
+            }
+        }
+        out.push('<');
+        i += 1;
+    }
+    if stripped_tags {
+        decode_entities(&out)
+            .trim_end_matches(['\n', '\r'])
+            .to_owned()
+    } else {
+        out
+    }
+}
+
+struct HtmlTag<'a> {
+    end: usize,
+    name: &'a str,
+    closing: bool,
+    has_attr: bool,
+}
+
+fn parse_tag<'a>(s: &'a str, start: usize) -> Option<HtmlTag<'a>> {
+    let bytes = s.as_bytes();
+    let mut i = start + 1;
+    let mut closing = false;
+    if i < bytes.len() && bytes[i] == b'/' {
+        closing = true;
+        i += 1;
+    }
+    let name_start = i;
+    if i >= bytes.len() || !bytes[i].is_ascii_alphabetic() {
+        return None;
+    }
+    i += 1;
+    while i < bytes.len()
+        && (bytes[i].is_ascii_alphanumeric() || bytes[i] == b'-' || bytes[i] == b':')
+    {
+        i += 1;
+    }
+    let name = &s[name_start..i];
+    let attr_start = i;
+    let mut quote: Option<u8> = None;
+    while i < bytes.len() {
+        let c = bytes[i];
+        if let Some(q) = quote {
+            if c == q {
+                quote = None;
+            }
+            i += 1;
+            continue;
+        }
+        if c == b'"' || c == b'\'' {
+            quote = Some(c);
+            i += 1;
+            continue;
+        }
+        if c == b'>' {
+            let raw_attr = &s[attr_start..i];
+            return Some(HtmlTag {
+                end: i + 1,
+                name,
+                closing,
+                has_attr: raw_attr.contains('='),
+            });
+        }
+        i += 1;
+    }
+    None
+}
+
+fn is_html_tag(name: &str) -> bool {
+    matches!(
+        name,
+        "a" | "abbr"
+            | "article"
+            | "aside"
+            | "b"
+            | "bdi"
+            | "bdo"
+            | "blockquote"
+            | "body"
+            | "br"
+            | "button"
+            | "caption"
+            | "center"
+            | "cite"
+            | "code"
+            | "col"
+            | "colgroup"
+            | "dd"
+            | "del"
+            | "div"
+            | "dl"
+            | "dt"
+            | "em"
+            | "figcaption"
+            | "figure"
+            | "font"
+            | "footer"
+            | "form"
+            | "h1"
+            | "h2"
+            | "h3"
+            | "h4"
+            | "h5"
+            | "h6"
+            | "head"
+            | "header"
+            | "hr"
+            | "html"
+            | "i"
+            | "img"
+            | "input"
+            | "ins"
+            | "kbd"
+            | "label"
+            | "li"
+            | "link"
+            | "main"
+            | "mark"
+            | "meta"
+            | "nav"
+            | "nobr"
+            | "ol"
+            | "p"
+            | "pre"
+            | "q"
+            | "s"
+            | "samp"
+            | "script"
+            | "section"
+            | "small"
+            | "span"
+            | "strike"
+            | "strong"
+            | "style"
+            | "sub"
+            | "sup"
+            | "table"
+            | "tbody"
+            | "td"
+            | "tfoot"
+            | "th"
+            | "thead"
+            | "title"
+            | "tr"
+            | "u"
+            | "ul"
+            | "var"
+            | "wbr"
+    )
+}
+
+fn is_break_tag(name: &str) -> bool {
+    matches!(
+        name,
+        "br" | "hr"
+            | "p"
+            | "div"
+            | "li"
+            | "tr"
+            | "h1"
+            | "h2"
+            | "h3"
+            | "h4"
+            | "h5"
+            | "h6"
+            | "blockquote"
+            | "pre"
+            | "section"
+            | "article"
+            | "header"
+            | "footer"
+            | "nav"
+            | "table"
+            | "ul"
+            | "ol"
+            | "dd"
+    )
+}
+
+fn is_style_format(c: char) -> bool {
+    matches!(
+        c,
+        '\u{00AD}'
+            | '\u{200B}'
+            | '\u{200C}'
+            | '\u{200D}'
+            | '\u{200E}'
+            | '\u{200F}'
+            | '\u{202A}'
+            | '\u{202B}'
+            | '\u{202C}'
+            | '\u{202D}'
+            | '\u{202E}'
+            | '\u{2060}'
+            | '\u{2066}'
+            | '\u{2067}'
+            | '\u{2068}'
+            | '\u{2069}'
+            | '\u{FEFF}'
+    )
+}
+
+fn decode_entities(s: &str) -> String {
+    let bytes = s.as_bytes();
+    let mut out = String::with_capacity(s.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'&'
+            && let Some(semi) = s[i + 1..].find(';')
+            && semi > 0
+            && semi <= 16
+            && let Some(ch) = decode_entity(&s[i + 1..i + 1 + semi])
+        {
+            out.push(ch);
+            i += 1 + semi + 1;
+            continue;
+        }
+        let ch = s[i..].chars().next().unwrap();
+        out.push(ch);
+        i += ch.len_utf8();
+    }
+    out
+}
+
+fn decode_entity(body: &str) -> Option<char> {
+    match body {
+        "amp" => Some('&'),
+        "lt" => Some('<'),
+        "gt" => Some('>'),
+        "quot" => Some('"'),
+        "apos" => Some('\''),
+        "nbsp" | "ensp" | "emsp" | "thinsp" => Some(' '),
+        _ => {
+            let hex = body.strip_prefix("#x").or_else(|| body.strip_prefix("#X"));
+            let code = if let Some(hex) = hex {
+                u32::from_str_radix(hex, 16).ok()?
+            } else {
+                let dec = body.strip_prefix('#')?;
+                dec.parse().ok()?
+            };
+            char::from_u32(code).filter(|c| *c != '\0' && !c.is_control())
+        }
+    }
+}
+
 pub fn hex(bytes: &[u8]) -> String {
     use std::fmt::Write;
     bytes
@@ -302,6 +674,42 @@ mod tests {
         for t in Tag::ORDER {
             assert_eq!(Tag::parse(t.as_str()), Some(t));
         }
+    }
+
+    #[test]
+    fn trim_drops_edge_blank_lines_and_fullwidth_spaces_only() {
+        assert_eq!(trim_edge_whitespace("\n\n  hello\u{3000}\n"), "hello");
+        assert_eq!(trim_edge_whitespace("\u{00A0}a\tb  "), "a\tb");
+        assert_eq!(trim_edge_whitespace("a \n\n b"), "a \n\n b");
+    }
+
+    #[test]
+    fn strip_styles_keeps_plain_text_from_console_and_html() {
+        assert_eq!(strip_style_marks("\u{1b}[1;32mOK\u{1b}[0m"), "OK");
+        assert_eq!(
+            strip_style_marks("\u{1b}]8;;https://example.com\u{7}link\u{1b}]8;;\u{7}"),
+            "link"
+        );
+        assert_eq!(strip_style_marks("\u{9b}31mred\u{9b}0m"), "red");
+        assert_eq!(
+            strip_style_marks("<span style=\"color:red\">hi</span>"),
+            "hi"
+        );
+        assert_eq!(
+            strip_style_marks("<p>a&amp;b&nbsp;c</p><p>d</p>"),
+            "a&b c\nd"
+        );
+        assert_eq!(
+            strip_style_marks("<script>alert(1)</script><b>ok</b>"),
+            "ok"
+        );
+        assert_eq!(strip_style_marks("<!--x--><i>t</i>"), "t");
+        assert_eq!(strip_style_marks("<span title=\"a>b\">x</span>"), "x");
+        assert_eq!(
+            strip_style_marks("if a < b && c > d { Vec<String> }"),
+            "if a < b && c > d { Vec<String> }"
+        );
+        assert_eq!(strip_style_marks("a\u{200b}b\u{feff}"), "ab");
     }
 
     #[test]
