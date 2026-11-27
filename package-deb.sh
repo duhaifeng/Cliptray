@@ -215,6 +215,7 @@ run_in_docker() {
     -v "$root/Cargo.lock:/work/Cargo.lock:ro" \
     -v "$root/README.md:/work/README.md:ro" \
     -v "$root/src:/work/src:ro" \
+    -v "$root/tests:/work/tests:ro" \
     -v "$root/assets:/work/assets:ro" \
     -v "$root/package-deb.sh:/work/package-deb.sh:ro" \
     -v "$root/dist:/work/dist" \
